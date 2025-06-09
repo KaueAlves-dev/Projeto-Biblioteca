@@ -1,7 +1,7 @@
 from Project.Models.models import Livro, Emprestimo, Cliente 
 from Project.Daos.dao import BibliotecaDao
 
-
+#teste de esteira
 # Aqui vai ficar toda a regra de negócio
 class Biblioteca:
   def __init__(self):
@@ -83,7 +83,7 @@ class Biblioteca:
     lista_livros = BibliotecaDao.list_all_livros()
     response = {
                   "status_code": 500, 
-                  "message": f"Atualizar quantidade do livro {e}",
+                  "message": f"Atualizar quantidade do livro",
                   "livros": lista_livros
                 }
     return response
