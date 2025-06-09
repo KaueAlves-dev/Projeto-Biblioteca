@@ -2,10 +2,7 @@ name: CI para Projeto Biblioteca
 
 on:
   push:       # Qualquer push em qualquer branch
-    branches: [ "*" ]
-
-  pull_request:  # Pull requests direcionados à branch main
-    branches: [ "*" ]
+  pull_request:  # Qualquer PR (independente da branch)
 
 jobs:
   test:
