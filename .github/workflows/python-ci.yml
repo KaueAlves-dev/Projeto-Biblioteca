@@ -1,8 +1,8 @@
 name: CI para Projeto Biblioteca
 
-on:
-  push:       # Qualquer push em qualquer branch
-  pull_request:  # Qualquer PR (independente da branch)
+#on:
+#  push:       # Qualquer push em qualquer branch
+#  pull_request:  # Qualquer PR (independente da branch)
 
 jobs:
   test:
