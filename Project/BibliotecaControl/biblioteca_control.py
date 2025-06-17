@@ -1,5 +1,5 @@
-from Project.Models.models import Livro, Emprestimo, Cliente 
-from Project.Daos.dao import BibliotecaDao
+from Models.models import Livro, Emprestimo, Cliente 
+from Daos.dao import BibliotecaDao
 
 #teste de esteira
 # Aqui vai ficar toda a regra de negócio
@@ -8,10 +8,8 @@ class Biblioteca:
     pass
 
   @staticmethod
-  def cadastrar_livro( titulo, autor, descricao, quantidade):
+  def cadastrar_livro( livro: Livro):
     try:
-      
-      livro = Livro(id = None, titulo = titulo, autor = autor, descricao = descricao, quantidade = quantidade)
       validacao = BibliotecaDao.search_livro_by_model(livro)
       if validacao:
         response = {
@@ -35,9 +33,8 @@ class Biblioteca:
       return response
     
   @staticmethod
-  def cadastrar_cliente( nome, telefone, email):
+  def cadastrar_cliente(cliente: Cliente):
     try:
-      cliente = Cliente(id = None, nome = nome, telefone = telefone, email = email)
 
       validacao = BibliotecaDao.search_cliente_by_model(cliente)
       if validacao:
@@ -80,26 +77,89 @@ class Biblioteca:
 
   @staticmethod
   def mostrar_livros():
-    lista_livros = BibliotecaDao.list_all_livros()
-    response = {
-                  "status_code": 500, 
-                  "message": f"Atualizar quantidade do livro",
-                  "livros": lista_livros
-                }
-    return response
+    try:
+        lista_livros = BibliotecaDao.list_all_livros()
+        livros = [{"id":livro[0],
+                   "titulo": livro[1],
+                   "autor": livro[2], 
+                   "descricao": livro[3],
+                   "quantidade": livro[4]
+                   } for livro in lista_livros]
+        
+        response = {
+            "status_code": 200,
+            "message": "Consulta realizada com sucesso.",
+            "livros": livros
+        }
+        return response
+    except Exception as e:
+        response = {
+            "status_code": 500,
+            "message": f"Erro ao consultar livros: {e}"
+        }
+        return response
+
+  @staticmethod
+  def mostrar_clientes():
+    try:
+        lista_clientes = BibliotecaDao.list_all_clientes()
+        clientes = [{"id":cliente[0],
+                   "nome": cliente[1],
+                   "telefone": cliente[2], "email": cliente[3]} for cliente in lista_clientes]
+      
+        response = {
+            "status_code": 200,
+            "message": "Consulta realizada com sucesso.",
+            "clientes": clientes
+        }
+        return response
+    except Exception as e:
+        response = {
+            "status_code": 500,
+            "message": f"Erro ao consultar clientes: {e}"
+        }
+        return response  
     
+  @staticmethod
+  def mostrar_emprestimos():
+    try:
+        lista_emprestimos = BibliotecaDao.list_all_emprestimos()
+        clientes = [{"id":emprestimo[0],
+                   "id_livro": emprestimo[1],
+                   "id_cliente": emprestimo[2], 
+                   "data_emprestimo": emprestimo[3], 
+                   "data_devolucao": emprestimo[4], 
+                   "status": emprestimo[5]} for emprestimo in lista_emprestimos]
+      
+        response = {
+            "status_code": 200,
+            "message": "Consulta realizada com sucesso.",
+            "clientes": clientes
+        }
+        return response
+    except Exception as e:
+        response = {
+            "status_code": 500,
+            "message": f"Erro ao consultar clientes: {e}"
+        }
+        return response
+      
   @staticmethod
   def validar_livro_disponivel(id_livro):
     return BibliotecaDao.search_livro_disponivel(id_livro)
+  
+  def validar_emprestimo(id_emprestimo):
+    return BibliotecaDao.search_emprestimo_by_id(id_emprestimo)
     
   @staticmethod  
   def validar_cliente_cadastrado(id_cliente):
     return BibliotecaDao.search_cliente_by_id(id_cliente)
   
-  def adicionar_emprestimo(self, id_livro, id_cliente, data_empr, data_dev):
+  def adicionar_emprestimo(self, emprestimo: Emprestimo):
     try:
-      valid_livro = self.validar_livro_disponivel(id_livro)
-      valid_cliente = self.validar_cliente_cadastrado(id_cliente)
+      
+      valid_livro = self.validar_livro_disponivel(emprestimo.id_livro)
+      valid_cliente = self.validar_cliente_cadastrado(emprestimo.id_cliente)
 
       if not valid_livro:
         return {
@@ -113,10 +173,8 @@ class Biblioteca:
               "message": "Cliente não cadastrado."
           }
 
-      emprestimo = Emprestimo(id= None, id_livro = id_livro, id_cliente= id_cliente, data_emprestimo = data_empr,
-    data_devolucao= data_dev)
       BibliotecaDao.insert_emprestimo(emprestimo)
-      self.atualizar_quantidade(id_livro, 'menos')
+      self.atualizar_quantidade(emprestimo.id_livro, 'menos')
       response = {
                 "status_code": 200, 
                 "message": "Emprestimo realizado com sucesso!"
@@ -132,8 +190,36 @@ class Biblioteca:
                 }
       return response
 
-  def devolver_livro(id_emprestimo):
-    pass
+  def devolver_livro(self, id_emprestimo):
+    try:
+      valid = self.validar_emprestimo(id_emprestimo)
+
+      if not valid:
+        response = {
+                "status_code": 404,
+                "message": "Emprestimo não encontrado."
+            }
+        return response
+      
+      BibliotecaDao.devolver_emprestimo(id_emprestimo)
+
+      response = {
+                "status_code": 200, 
+                "message": "Livro devolvido com sucesso!"
+              }
+      return response
+
+    except Exception as e:
+      response = {
+                  "status_code": 500, 
+                  "message": f"Erro ao realizar emprestimo do livro {e}"
+                }
+      return response
+
+
+    
+
+
 
 
     

@@ -1,0 +1,18 @@
+# Ignora caches do Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Ignora arquivos de log e temporários
+*.log
+*.tmp
+
+# Ignora arquivos de configuração pessoais
+.env
+*.env
+
+# Ignora pastas de IDEs (como VSCode ou PyCharm)
+.vscode/
+.idea/
+
+

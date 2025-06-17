@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from datetime import date, datetime
+from datetime import datetime, timedelta
 
 @dataclass
 class LivroDTO:
@@ -36,8 +36,8 @@ class ClienteDTO:
 class EmprestimoDTO:
   id_livro: int
   id_cliente: int
-  data_emprestimo: date
-  data_devolucao: date
+  data_emprestimo: str
+  data_devolucao: str
   status: str = "ativo"
 
   @classmethod
@@ -45,15 +45,9 @@ class EmprestimoDTO:
     return cls(
               id_livro = payload['id_livro'],
               id_cliente = payload['id_cliente'],
-              data_emprestimo = cls._parse_date(payload['data_emprestimo']),
-              data_devolucao = cls._parse_date(payload['data_devolucao']),
+              data_emprestimo = datetime.now().strftime('%Y-%m-%d'),         # string: '2025-06-09'
+              data_devolucao = (datetime.now() + timedelta(days=30)).strftime('%Y-%m-%d'),  # string: '2025-07-09',
               status = payload.get('status', 'ativo')
     )
   
-  @staticmethod
-  def _parse_date(date_str: str) -> date:
-      """Converte string (YYYY-MM-DD) em date."""
-      try:
-          return datetime.strptime(date_str, "%Y-%m-%d").date()
-      except ValueError:
-          raise ValueError(f'Data inválida: {date_str}. Use o formato YYYY-MM-DD.')
+ 

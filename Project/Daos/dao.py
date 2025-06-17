@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 import sqlite3 as sql
-from Project.Models.models import Livro, Cliente, Emprestimo
+from Models.models import Livro, Cliente, Emprestimo
 
 @dataclass
 class BibliotecaDao:
@@ -19,6 +19,34 @@ class BibliotecaDao:
     
     finally:
       conn.close() 
+
+  def list_all_clientes():
+    
+    try:
+
+      conn = sql.connect('biblioteca.db')
+      cursor = conn.cursor()
+
+      query = cursor.execute('SELECT * FROM clientes').fetchall()
+
+      return query
+    
+    finally:
+      conn.close()  
+
+  def list_all_emprestimos():
+    
+    try:
+
+      conn = sql.connect('biblioteca.db')
+      cursor = conn.cursor()
+
+      query = cursor.execute('SELECT * FROM emprestimos').fetchall()
+
+      return query
+    
+    finally:
+      conn.close()        
 
   @staticmethod
   def insert_livro(livro: Livro):
@@ -81,7 +109,9 @@ class BibliotecaDao:
       cursor = conn.cursor()
 
       new_quantidade = self.get_new_qtde_livro(id, operacao)
-
+      if new_quantidade is None:
+        return False
+      
       cursor.execute('''UPDATE livros 
                               SET quantidade = ?
                               WHERE id = ?  ''', (new_quantidade, id))
@@ -132,16 +162,23 @@ class BibliotecaDao:
     finally:
       conn.close()    
 
-  @staticmethod
-  def update_status_emprestimo(id, new_status):
+  
+  def devolver_emprestimo(self, id):
     try:
       conn = sql.connect('biblioteca.db')
       cursor = conn.cursor()
 
+      query = cursor.execute('''SELECT id_livro
+                        FROM emprestimos
+                        WHERE id = ?  ''', (id, )).fetchone()
+
       cursor.execute('''UPDATE emprestimos 
                               SET status = ?
-                              WHERE id = ?  ''', (new_status, id))
+                              WHERE id = ?  ''', ("devolvido", id))
       conn.commit()
+      
+      id_livro = query[0]
+      self.update_qtde_livro(id_livro, "mais")
 
       return True
 
@@ -207,5 +244,20 @@ class BibliotecaDao:
       return True if query else False
     
     finally:
-      conn.close()  
+      conn.close() 
+
+  @staticmethod
+  def search_emprestimo_by_id(id: int):
+    try:
+      conn = sql.connect('biblioteca.db')
+      cursor = conn.cursor()
+
+      query = cursor.execute('''SELECT id 
+                        FROM emprestimos
+                        WHERE id = ?''', (id, )).fetchone()
+      
+      return True if query else False
+    
+    finally:
+      conn.close()     
 
