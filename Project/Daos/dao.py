@@ -20,6 +20,7 @@ class BibliotecaDao:
     finally:
       conn.close() 
 
+  @staticmethod
   def list_all_clientes():
     
     try:
@@ -33,7 +34,7 @@ class BibliotecaDao:
     
     finally:
       conn.close()  
-
+  @staticmethod
   def list_all_emprestimos():
     
     try:
@@ -102,44 +103,32 @@ class BibliotecaDao:
     finally:
       conn.close() 
 
-  
-  def update_qtde_livro(self, id, operacao):
+  @staticmethod
+  def get_qtde_livro(id_livro: int):
+    try:  
+      conn = sql.connect('biblioteca.db')
+      cursor = conn.cursor()
+      query = cursor.execute('''SELECT quantidade 
+                                  FROM livros 
+                                  WHERE id = ?  ''', (id_livro, )).fetchone()
+
+      return query[0]
+    
+    finally:
+      conn.close()  
+
+  @staticmethod
+  def update_qtde_livro(id_livro: int, quantidade):
     try:
       conn = sql.connect('biblioteca.db')
       cursor = conn.cursor()
 
-      new_quantidade = self.get_new_qtde_livro(id, operacao)
-      if new_quantidade is None:
-        return False
-      
       cursor.execute('''UPDATE livros 
                               SET quantidade = ?
-                              WHERE id = ?  ''', (new_quantidade, id))
+                              WHERE id = ?  ''', (quantidade, id_livro))
       conn.commit()
 
       return True
-
-    finally:
-      conn.close()
-
-  @staticmethod
-  def get_new_qtde_livro(id, operacao):
-    try:
-      conn = sql.connect('biblioteca.db')
-      cursor = conn.cursor()
-
-      query = cursor.execute('''SELECT quantidade 
-                                FROM livros 
-                                WHERE id = ?  ''', (id, )).fetchone()
-
-      quantidade_atual = query[0]
-
-      if operacao == 'mais':
-          return quantidade_atual + 1
-      elif operacao == 'menos':
-          return quantidade_atual - 1 if quantidade_atual > 0 else 0
-      else:
-          return None  # Operação inválida
 
     finally:
       conn.close()
@@ -162,23 +151,16 @@ class BibliotecaDao:
     finally:
       conn.close()    
 
-  
-  def devolver_emprestimo(self, id):
+  @staticmethod
+  def devolver_emprestimo(id_emprestimo: int):
     try:
       conn = sql.connect('biblioteca.db')
       cursor = conn.cursor()
 
-      query = cursor.execute('''SELECT id_livro
-                        FROM emprestimos
-                        WHERE id = ?  ''', (id, )).fetchone()
-
       cursor.execute('''UPDATE emprestimos 
                               SET status = ?
-                              WHERE id = ?  ''', ("devolvido", id))
+                              WHERE id = ?  ''', ("devolvido", id_emprestimo))
       conn.commit()
-      
-      id_livro = query[0]
-      self.update_qtde_livro(id_livro, "mais")
 
       return True
 
@@ -261,3 +243,18 @@ class BibliotecaDao:
     finally:
       conn.close()     
 
+
+  @staticmethod
+  def search_livro_by_emprestimo(id_emprestimo: int):
+    try:
+      conn = sql.connect('biblioteca.db')
+      cursor = conn.cursor()
+
+      query = cursor.execute('''SELECT id_livro 
+                        FROM emprestimos
+                        WHERE id = ?''', (id_emprestimo, )).fetchone()
+      
+      return query[0]
+    
+    finally:
+      conn.close()  

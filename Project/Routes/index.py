@@ -57,6 +57,18 @@ def listar_emprestimos():
   return Response(json.dumps(response), mimetype='application/json')
 
 # Atualizar quantidade de livros
+@bluep.route('/atualizar-quantidade', methods = ['POST'])
+def atualizar_quantidade():
+  print('Atualizando quantidade de livro')
+  payload = request.json
+  response = Biblioteca.atualizar_quantidade(payload['id_livro'], payload['quantidade'])
+  return Response(json.dumps(response), mimetype='application/json')
 
-
-#
+#Devolver livro
+@bluep.route('/devolver-livro', methods = ['POST'])
+def devolver_emprestimo():
+  print('Iniciando devolução de livro')
+  payload = request.json
+  biblioteca = Biblioteca()
+  response = biblioteca.devolver_livro(payload['id_emprestimo'])
+  return Response(json.dumps(response), mimetype='application/json')

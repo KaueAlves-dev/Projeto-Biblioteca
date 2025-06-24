@@ -59,9 +59,9 @@ class Biblioteca:
       return response
     
   @staticmethod
-  def atualizar_quantidade(id_livro: int, operacao: str):
+  def atualizar_quantidade(id_livro: int, quantidade: int):
     try:
-      BibliotecaDao.update_qtde_livro(id_livro, operacao)
+      BibliotecaDao.update_qtde_livro(id_livro, quantidade)
       response = {
                     "status_code": 200, 
                     "message": "Quantidade do livro atualizada com sucesso"
@@ -148,6 +148,7 @@ class Biblioteca:
   def validar_livro_disponivel(id_livro):
     return BibliotecaDao.search_livro_disponivel(id_livro)
   
+  @staticmethod
   def validar_emprestimo(id_emprestimo):
     return BibliotecaDao.search_emprestimo_by_id(id_emprestimo)
     
@@ -174,7 +175,10 @@ class Biblioteca:
           }
 
       BibliotecaDao.insert_emprestimo(emprestimo)
-      self.atualizar_quantidade(emprestimo.id_livro, 'menos')
+      quantidade_atual = BibliotecaDao.get_qtde_livro(emprestimo.id_livro)
+      quantidade_nova = quantidade_atual - 1 if quantidade_atual > 0 else 0
+      BibliotecaDao.update_qtde_livro(emprestimo.id_livro, quantidade_nova)
+
       response = {
                 "status_code": 200, 
                 "message": "Emprestimo realizado com sucesso!"
@@ -202,6 +206,10 @@ class Biblioteca:
         return response
       
       BibliotecaDao.devolver_emprestimo(id_emprestimo)
+      id_livro = BibliotecaDao.search_livro_by_emprestimo(id_emprestimo)
+      quantidade_atual = BibliotecaDao.get_qtde_livro(id_livro)
+      quantidade_nova = quantidade_atual + 1
+      BibliotecaDao.update_qtde_livro(id_livro, quantidade_nova)
 
       response = {
                 "status_code": 200, 
