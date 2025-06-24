@@ -1,7 +1,9 @@
-from flask import Blueprint, request, jsonify, Response
+from flask import Blueprint, request, Response
 import json
 from Dtos.dto import ClienteDTO, LivroDTO, EmprestimoDTO
 from BibliotecaControl.biblioteca_control import Biblioteca
+from json_schemas.event import EVENT_SCHEMA_cadastrar_emprestimo, EVENT_SCHEMA_atualizar_quantidade, EVENT_SCHEMA_cadastrar_cliente, EVENT_SCHEMA_cadastrar_livro, EVENT_SCHEMA_devolver_livro
+
 
 bluep = Blueprint('bluep', __name__)
 
