@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 import sqlite3 as sql
-from Models.models import Livro, Cliente, Emprestimo
+from models.models import Livro, Cliente, Emprestimo
 
 @dataclass
 class BibliotecaDao:

@@ -1,5 +1,5 @@
-from Models.models import Livro, Emprestimo, Cliente 
-from Daos.dao import BibliotecaDao
+from models.models import Livro, Emprestimo, Cliente 
+from daos.dao import BibliotecaDao
 
 #teste de esteira
 # Aqui vai ficar toda a regra de negócio
